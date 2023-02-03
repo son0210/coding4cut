@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>코딩네컷</title>
+    <style>
+      /* 이서윤체 폰트 적용을 위한 코드 */
+      @font-face {
+        font-family: "LeeSeoyun";
+        src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2202-2@1.0/LeeSeoyun.woff")
+          format("woff");
+        font-weight: normal;
+        font-style: normal;
+      }
+
+      /* body태그 자체에 css 요소 부여 */
+      body {
+        font-family: "LeeSeoyun";
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        background-image: url("./background.png");
+      }
+
+      .container {
+        width: 390px;
+        background-color: #ff9d73;
+        height: 100%;
+      }
+      .photos {
+        margin-top: 30px;
+      }
+
+      .photo-frame {
+        background-color: white;
+        margin: 15px 20px;
+        height: 200px;
+        background-size: cover;
+        position: relative;
+		cursor: pointer;
+      }
+
+      /* 하단 영역 스타일링 */
+      .footer {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .f-title {
+        font-size: 25px;
+        font-weight: 900;
+        color: white;
+      }
+      .f-date {
+        font-size: 15px;
+        font-weight: 500;
+        color: white;
+      }
+
+      #image1 {
+        background-image: url("./img1.jpg");
+      }
+      #image2 {
+        background-image: url("./img2.jpg");
+      }
+      #image3 {
+        background-image: url("./img3.jpg");
+      }
+
+      .photo-description {
+        color: white;
+        background-color: #b3bff1;
+        width: fit-content;
+        padding: 0 20px;
+        margin-bottom: 10px;
+        border-radius: 10px;
+        position: absolute;
+        bottom: 0;
+        transform: translate(-50%);
+        left: 50%;
+		width: max-content;
+		opacity: 0;
+      }
+
+	  .video {
+			width: 100%;
+			height: 100%;
+	  }
+
+	  /* opacity : 투명도를 의미해요! 0% 투명하다. 즉 다 보인다. */
+	  .showText {
+		opacity: 0;
+	  }
+	  /* transition : 나타날 때 0.5초동안 천천히 나타나는 효과를 주라는 의미에요 */
+	  .hideText {
+		opacity: 1;
+		transition: opacity 0.5s linear;
+	  }
+	  @keyframes rtans {
+        0% {
+          bottom: 0px;
+        }
+        100% {
+          bottom: 100px;
+        }
+      }
+
+      .absolute-rtan-area {
+        position: fixed;
+        right: 10px;
+        bottom: 10px;
+
+        /* 아이콘 이동 애니메이션 관련 설정 */
+        animation-name: rtans;
+        animation-duration: 2s;
+        animation-duration: linear;
+        animation-iteration-count: infinite;
+        animation-direction: alternate;
+        animation-fill-mode: forwards;
+      }
+
+      .absolute-rtan-area img {
+        width: 150px;
+        cursor: pointer;
+      }
+
+      #modal.modal-overlay {
+        width: 100%;
+        height: 100%;
+        position: fixed;
+        left: 0;
+        top: 0;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.25);
+        backdrop-filter: blur(1.5px);
+        border-radius: 10px;
+        display: none;
+      }
+
+      #modal .modal-window {
+        background: white;
+        box-shadow: 0 8px 32px 0 grey;
+        backdrop-filter: blur(13.5px);
+        -webkit-backdrop-filter: blur(13.5px);
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        width: 350px;
+        height: 350px;
+        position: relative;
+        padding: 10px;
+      }
+
+      #modal .close-area {
+        display: inline;
+        float: right;
+        padding-right: 10px;
+        cursor: pointer;
+        color: black;
+        position: absolute;
+        right: 0;
+      }
+
+      #modal .content {
+        margin-top: 10px;
+        padding: 0px 10px;
+        color: black;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      #modal .content img {
+        width: 65%;
+        margin-top: 30px;
+        margin-bottom: 20px;
+      }
+
+      #modal .content span {
+        font-size: 20px;
+        margin: 2px;
+        font-weight: 900;
+        font-family: auto;
+      }
+
+      #modal .content button {
+        position: absolute;
+        bottom: 20px;
+        width: 90%;
+        height: 50px;
+        color: white;
+        background: green;
+        border: 0;
+        border-radius: 10px;
+        font-size: 15px;
+        font-weight: 500;
+        cursor: pointer;
+      }
+    </style>
+	<script>
+		// 텍스트가 보여지는 기능
+		// 1. 몇 번째 사진에 마우스가 올라갔는지 확인(if문)
+		// 2. 해당 사진을 찾아 hideText class를 지워주고, showText는 삽입해줌
+		function showText(number) {
+		if (number === 1) {
+			document.querySelector("#desc1").classList.remove("hideText");
+			document.querySelector("#desc1").classList.add("showText");
+		} else if (number === 2) {
+			document.querySelector("#desc2").classList.remove("hideText");
+			document.querySelector("#desc2").classList.add("showText");
+		} else {
+			document.querySelector("#desc3").classList.remove("hideText");
+			document.querySelector("#desc3").classList.add("showText");
+		}
+		}
+
+		// 텍스트가 감춰지는 기능
+		// 1. 몇 번째 사진에서 마우스가 벗어났는지 확인(if문)
+		// 2. 해당 사진을 찾아 shotText class를 지워주고, hideText는 삽입해줌
+		function hideText(number) {
+		if (number === 1) {
+			document.querySelector("#desc1").classList.remove("showText");
+			document.querySelector("#desc1").classList.add("hideText");
+		} else if (number === 2) {
+			document.querySelector("#desc2").classList.remove("showText");
+			document.querySelector("#desc2").classList.add("hideText");
+		} else {
+			document.querySelector("#desc3").classList.remove("showText");
+			document.querySelector("#desc3").classList.add("hideText");
+		}
+		}
+		
+		function showModal() {
+        const modal = document.getElementById("modal");
+        modal.style.display = "flex";
+      }
+
+      function closeModal() {
+        const modal = document.getElementById("modal");
+        modal.style.display = "none";
+      }
+	</script>
+  </head>
+  <body>
+    <div class="container">
+		<div
+		id="image1"
+		class="photo-frame"
+		onmouseover="hideText(1)"
+		onmouseout="showText(1)"
+		onclick="alertText(1)"
+	>
+		<span id="desc1" class="photo-description">
+			어색 가득했던 첫만남
+		</span>
+	</div>
+	<div
+		id="image2" class="photo-frame"
+		onmouseover="hideText(2)"
+		onmouseout="showText(2)"
+		onclick="alertText(2)"
+	>
+		<span id="desc2" class="photo-description">
+			말랑 몰아주기컷
+		</span>
+	</div>
+	<div
+		id="image3"
+		class="photo-frame"
+		onmouseover="hideText(3)"
+		onmouseout="showText(3)"
+		onclick="alertText(3)"
+	>
+		<span id="desc3" class="photo-description">
+			행복했던 두 번째 만남
+		</span>
+	</div>
+        <div class="photo-frame">
+			<iframe
+				src="https://www.youtube.com/embed/DR_Y8GA6OqY"
+				frameborder="0"
+				class="video"
+			></iframe>
+		</div>
+      <div class="footer">
+        <p class="f-title">Happy Day♡</p>
+        <p class="f-date">2023.02.03</p>
+      </div>
+    </div>
+    <div class="absolute-rtan-area">
+      <img src="./rtans.png" onclick="showModal()" />
+    </div>
+	<div class="absolute-rtan-area">
+		<img src="https://s3.ap-northeast-2.amazonaws.com/materials.spartacodingclub.kr/free_photos/rtans.png" onclick="showModal()" />
+	</div>
+	<div id="modal" class="modal-overlay">
+		<div class="modal-window">
+		  <div class="close-area" onclick="closeModal()">𝗫</div>
+		  <div class="content">
+			<img src="./rtans.png" />
+			<span>조만간 또 보자 우리</span>
+			<span>방탈출 하러 가야지 :)</span>
+			<button onclick="location.href='https://m.blog.naver.com/zhdnrk1/222969581307'">
+			  방탈출 후기 보러가기
+			</button>
+		  </div>
+  </body>
+</html>
